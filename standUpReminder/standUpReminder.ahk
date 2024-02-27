@@ -20,7 +20,8 @@ ToolTip
 
 ;use sleep version
 wait:
-Sleep, 3600000
+;Sleep, 3600000
+Sleep, 1800000
 ;Sleep, 2000
 MsgBox, 4, Stand Up Reminder, Stand up!`nWould you like it to remind later?
 IfMsgBox Yes
