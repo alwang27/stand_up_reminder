@@ -6,7 +6,7 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 Coordmode, Mouse, Screen
 ; code
-ToolTip, 一小时后将提示您起身舒展身体。
+ToolTip, 30分钟后后将提示您起身舒展身体。
 Sleep, 2000
 ToolTip
 ;use SetTimer version
@@ -20,10 +20,15 @@ ToolTip
 
 ;use sleep version
 wait:
+; an hour
 ;Sleep, 3600000
+; half an hour
 Sleep, 1800000
-;Sleep, 2000
-MsgBox, 4, Stand Up Reminder, Stand up!`nWould you like it to remind later?
+; for test
+; Sleep, 2000
+; 4+4096, 4 sets the msgbox with Yes/No buttons, 4096 sets it with system modal, which will make it always on top.
+; I need the window to be on top, so it will not be hidden after I click on other area.
+MsgBox, 4100, Stand Up Reminder, Stand up!`nWould you like it to remind later?
 IfMsgBox Yes
 	Goto, wait
 return
