@@ -5,6 +5,7 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 Coordmode, Mouse, Screen
+Menu, Tray, Icon, stand.ico
 ; code
 ToolTip, 30分钟后将提示您起身舒展身体。
 Sleep, 2000
