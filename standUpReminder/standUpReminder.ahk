@@ -38,7 +38,7 @@ if WinExist("War Thunder")
 	; 4+262144 = 262148, 262144 sets the msgbox on top too, but omits title bar icon.
 ; MsgBox, 4100, Stand Up Reminder, Stand up!`nWould you like it to remind later?
 	MsgBox, 262148, Stand Up Reminder, Stand up!`nWould you like it to remind later?
-IfMsgBox Yes
+	IfMsgBox Yes
 		Goto, wait
 }
 return
