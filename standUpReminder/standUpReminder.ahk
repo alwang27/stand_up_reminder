@@ -22,7 +22,7 @@ ToolTip
 ;use sleep version
 wait:
 ; an hour
-;Sleep, 3600000
+; Sleep, 3600000
 ; half an hour
 Sleep, 1800000
 ; for test
@@ -33,10 +33,12 @@ if WinExist("War Thunder")
 }
 	Else
 {
-	; 4+4096, 4 sets the msgbox with Yes/No buttons, 4096 sets it with system modal, which will make it always on top.
+	; 4100 = 4+4096, 4 sets the msgbox with Yes/No buttons, 4096 sets it with system modal, which will make it always on top.
 	; I need the window to be on top, so it will not be hidden after I click on other area.
-	MsgBox, 4100, Stand Up Reminder, Stand up!`nWould you like it to remind later?
-	IfMsgBox Yes
+	; 4+262144 = 262148, 262144 sets the msgbox on top too, but omits title bar icon.
+; MsgBox, 4100, Stand Up Reminder, Stand up!`nWould you like it to remind later?
+	MsgBox, 262148, Stand Up Reminder, Stand up!`nWould you like it to remind later?
+IfMsgBox Yes
 		Goto, wait
 }
 return
