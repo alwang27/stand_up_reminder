@@ -27,9 +27,16 @@ wait:
 Sleep, 1800000
 ; for test
 ; Sleep, 2000
-; 4+4096, 4 sets the msgbox with Yes/No buttons, 4096 sets it with system modal, which will make it always on top.
-; I need the window to be on top, so it will not be hidden after I click on other area.
-MsgBox, 4100, Stand Up Reminder, Stand up!`nWould you like it to remind later?
-IfMsgBox Yes
-	Goto, wait
+if WinExist("War Thunder")
+{
+	Goto, Wait
+}
+	Else
+{
+	; 4+4096, 4 sets the msgbox with Yes/No buttons, 4096 sets it with system modal, which will make it always on top.
+	; I need the window to be on top, so it will not be hidden after I click on other area.
+	MsgBox, 4100, Stand Up Reminder, Stand up!`nWould you like it to remind later?
+	IfMsgBox Yes
+		Goto, wait
+}
 return
