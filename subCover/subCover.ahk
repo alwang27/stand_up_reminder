@@ -18,9 +18,9 @@ gui, subCover: new
 ;gui, show, w1440 h150 x0 y750
 ;yPos := A_ScreenHeight - 150
 yPos := A_ScreenHeight - height
-gui, show, w%A_ScreenWidth% h%height% x0 y%yPos%
+gui, show, w%A_ScreenWidth% h%height% x0 y%yPos%, subCover
 ;winset, transparent, 255, subCover.ahk
 ;black is 000000
 gui, color, 000000
 gui -caption
-WinSet, AlwaysOnTop, on, subCover.ahk
+WinSet, AlwaysOnTop, on, subCover
