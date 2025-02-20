@@ -39,8 +39,7 @@ if WinExist("War Thunder")
 	Gui, Color, 1C1C1C, 2D2D2D  ; 深灰色背景
 	Gui, Font, cWhite s10, Segoe UI  ; 白色文字
 	Gui, Add, Text,, Stand up!`nWould you like it to remind later?
-	Gui, Add, Button, gYesButton w60, Yes
-	Gui, Add, Button, x+10 gNoButton w60, No
+	Gui, Add, Button, gYesButton w60 Default, Yes
 	Gui, +AlwaysOnTop  ; 保持窗口置顶
 	
 	; 获取屏幕尺寸
@@ -81,15 +80,14 @@ MoveWindow:
 return
 
 YesButton:
-	SetTimer, CheckMouse, Off    ; 关闭鼠标检测定时器
+	SetTimer, CheckMouse, Off
 	SetTimer, MoveWindow, Off
 	Gui, Destroy
-	Sleep, 2000  ; 添加短暂延迟
 	Goto, wait
 return
 
-NoButton:
-	SetTimer, CheckMouse, Off    ; 关闭鼠标检测定时器
+GuiClose:
+	SetTimer, CheckMouse, Off
 	SetTimer, MoveWindow, Off
 	Gui, Destroy
 	ExitApp
