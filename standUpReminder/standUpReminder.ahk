@@ -33,6 +33,8 @@ if WinExist("War Thunder")
 }
 	Else
 {
+	global isMouseOver := false  ; 添加全局变量跟踪鼠标状态
+	
 	Gui, Destroy  ; 确保先清除可能存在的旧GUI
 	Gui, Color, 1C1C1C, 2D2D2D  ; 深灰色背景
 	Gui, Font, cWhite s10, Segoe UI  ; 白色文字
@@ -54,21 +56,32 @@ if WinExist("War Thunder")
 	Random, x, %MonitorWorkAreaLeft%, %maxX%
 	Random, y, %MonitorWorkAreaTop%, %maxY%
 	Gui, Show, x%x% y%y%, Stand Up Reminder
+	SetTimer, CheckMouse, 100    ; 添加鼠标检测定时器
 	SetTimer, MoveWindow, 1000
 	WinWaitClose, Stand Up Reminder  ; 等待GUI窗口关闭
 }
 return
 
+CheckMouse:
+	MouseGetPos,,, MouseWin
+	WinGetTitle, CurrTitle, ahk_id %MouseWin%
+	isMouseOver := (CurrTitle = "Stand Up Reminder")
+return
+
 MoveWindow:
-	WinGetPos,,, w, h, Stand Up Reminder
-	maxX := MonitorWorkAreaRight - w
-	maxY := MonitorWorkAreaBottom - h
-	Random, x, %MonitorWorkAreaLeft%, %maxX%
-	Random, y, %MonitorWorkAreaTop%, %maxY%
-	WinMove, Stand Up Reminder,, %x%, %y%
+	if (!isMouseOver)   ; 只在鼠标不在窗口上时移动
+	{
+		WinGetPos,,, w, h, Stand Up Reminder
+		maxX := MonitorWorkAreaRight - w
+		maxY := MonitorWorkAreaBottom - h
+		Random, x, %MonitorWorkAreaLeft%, %maxX%
+		Random, y, %MonitorWorkAreaTop%, %maxY%
+		WinMove, Stand Up Reminder,, %x%, %y%
+	}
 return
 
 YesButton:
+	SetTimer, CheckMouse, Off    ; 关闭鼠标检测定时器
 	SetTimer, MoveWindow, Off
 	Gui, Destroy
 	Sleep, 2000  ; 添加短暂延迟
@@ -76,6 +89,7 @@ YesButton:
 return
 
 NoButton:
+	SetTimer, CheckMouse, Off    ; 关闭鼠标检测定时器
 	SetTimer, MoveWindow, Off
 	Gui, Destroy
 	ExitApp
