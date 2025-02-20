@@ -24,9 +24,9 @@ wait:
 ; an hour
 ; Sleep, 3600000
 ; half an hour
-; Sleep, 1800000
+Sleep, 1800000
 ; for test
-Sleep, 2000
+; Sleep, 2000
 if WinExist("War Thunder")
 {
 	Goto, Wait
