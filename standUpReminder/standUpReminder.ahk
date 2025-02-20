@@ -40,18 +40,43 @@ if WinExist("War Thunder")
 	Gui, Add, Button, gYesButton w60, Yes
 	Gui, Add, Button, x+10 gNoButton w60, No
 	Gui, +AlwaysOnTop  ; 保持窗口置顶
-	Gui, Show,, Stand Up Reminder
+	
+	; 获取屏幕尺寸
+	SysGet, MonitorWorkArea, MonitorWorkArea
+	
+	; 获取GUI尺寸
+	Gui, Show, Hide
+	WinGetPos,,, w, h
+	
+	; 显示GUI并启动移动定时器
+	maxX := MonitorWorkAreaRight - w
+	maxY := MonitorWorkAreaBottom - h
+	Random, x, %MonitorWorkAreaLeft%, %maxX%
+	Random, y, %MonitorWorkAreaTop%, %maxY%
+	Gui, Show, x%x% y%y%, Stand Up Reminder
+	SetTimer, MoveWindow, 1000
 	WinWaitClose, Stand Up Reminder  ; 等待GUI窗口关闭
 }
 return
 
+MoveWindow:
+	WinGetPos,,, w, h, Stand Up Reminder
+	maxX := MonitorWorkAreaRight - w
+	maxY := MonitorWorkAreaBottom - h
+	Random, x, %MonitorWorkAreaLeft%, %maxX%
+	Random, y, %MonitorWorkAreaTop%, %maxY%
+	WinMove, Stand Up Reminder,, %x%, %y%
+return
+
 YesButton:
+	SetTimer, MoveWindow, Off
 	Gui, Destroy
 	Sleep, 2000  ; 添加短暂延迟
 	Goto, wait
 return
 
 NoButton:
+	SetTimer, MoveWindow, Off
 	Gui, Destroy
 	ExitApp
 return
