@@ -7,16 +7,25 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 Coordmode, Mouse, Screen
 Menu, Tray, Icon, stand.ico
 
+; 初始化主题设置
+global isDarkTheme := true
+
 ; 初始化程序列表
 global programList := []
 ReadProgramList()
 
 ; 添加托盘菜单
 Menu, Tray, NoStandard
+Menu, ThemeMenu, Add, 深色主题, ToggleDarkTheme
+Menu, ThemeMenu, Add, 浅色主题, ToggleLightTheme
+Menu, Tray, Add, 主题设置, :ThemeMenu
 Menu, Tray, Add, 管理程序列表, ManagePrograms
 Menu, Tray, Add
 Menu, Tray, Add, 退出, GuiClose
 Menu, Tray, Default, 管理程序列表
+
+; 设置初始主题选中状态
+Menu, ThemeMenu, Check, 深色主题
 
 ; 获取用户输入的等待时间
 InputBox, userWait, 设置提醒时间, 请输入提醒间隔时间(分钟):,, 250, 130,,,,, 30    ; 默认30分钟
@@ -63,8 +72,16 @@ wait:    ; 主循环开始
     global isMouseOver := false    ; 初始化鼠标状态跟踪
     
     Gui, Destroy    ; 清理可能存在的旧界面
-    Gui, Color, 1C1C1C, 2D2D2D    ; 设置深色主题
-    Gui, Font, cWhite s10, Segoe UI    ; 设置白色字体
+    if (isDarkTheme)
+    {
+        Gui, Color, 1C1C1C, 2D2D2D    ; 深色主题
+        Gui, Font, cWhite s10, Segoe UI
+    }
+    else
+    {
+        Gui, Color, F0F0F0, FFFFFF    ; 浅色主题
+        Gui, Font, c000000 s10, Segoe UI
+    }
     Gui, Add, Text,, Stand up!`nWould you like it to remind later?    ; 添加提示文本
     Gui, Add, Button, gYesButton w60 Default, Yes    ; 添加确认按钮
     Gui, +AlwaysOnTop    ; 设置窗口始终置顶
@@ -140,6 +157,16 @@ SaveProgramList() {
 
 ManagePrograms:
     Gui, 2:New
+    if (isDarkTheme)
+    {
+        Gui, 2:Color, 1C1C1C, 2D2D2D
+        Gui, 2:Font, cWhite s10, Segoe UI
+    }
+    else
+    {
+        Gui, 2:Color, F0F0F0, FFFFFF
+        Gui, 2:Font, c000000 s10, Segoe UI
+    }
     Gui, 2:Add, ListView, r10 w300 vProgramListView, 程序名称
     for index, program in programList
         LV_Add(, program)
@@ -179,4 +206,17 @@ return
 2GuiClose:
 2GuiEscape:
     Gui, 2:Destroy
+return
+
+; 添加主题切换函数（放在文件末尾）
+ToggleDarkTheme:
+    Menu, ThemeMenu, Check, 深色主题
+    Menu, ThemeMenu, Uncheck, 浅色主题
+    isDarkTheme := true
+return
+
+ToggleLightTheme:
+    Menu, ThemeMenu, Check, 浅色主题
+    Menu, ThemeMenu, Uncheck, 深色主题
+    isDarkTheme := false
 return
