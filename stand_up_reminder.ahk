@@ -42,35 +42,33 @@ wait:    ; 主循环开始
 
     if WinExist("War Thunder")    ; 检查游戏是否运行
     {
-        Goto, wait    ; 如果游戏运行中，跳过这次提醒
+        WinWaitClose, War Thunder    ; 等待游戏窗口关闭
     }
-        Else
-    {
-        global isMouseOver := false    ; 初始化鼠标状态跟踪
-        
-        Gui, Destroy    ; 清理可能存在的旧界面
-        Gui, Color, 1C1C1C, 2D2D2D    ; 设置深色主题
-        Gui, Font, cWhite s10, Segoe UI    ; 设置白色字体
-        Gui, Add, Text,, Stand up!`nWould you like it to remind later?    ; 添加提示文本
-        Gui, Add, Button, gYesButton w60 Default, Yes    ; 添加确认按钮
-        Gui, +AlwaysOnTop    ; 设置窗口始终置顶
-        
-        ; 获取屏幕尺寸
-        SysGet, MonitorWorkArea, MonitorWorkArea    ; 获取工作区尺寸
-        
-        ; 获取GUI尺寸
-        Gui, Show, Hide    ; 临时显示用于获取尺寸
-        WinGetPos,,, w, h    ; 获取窗口尺寸
-        
-        ; 显示GUI并启动移动定时器
-        maxX := MonitorWorkAreaRight - w
-        maxY := MonitorWorkAreaBottom - h
-        Random, x, %MonitorWorkAreaLeft%, %maxX%    ; 随机X坐标
-        Random, y, %MonitorWorkAreaTop%, %maxY%    ; 随机Y坐标
-        Gui, Show, x%x% y%y%, Stand Up    ; 在随机位置显示窗口
-        SetTimer, CheckMouse, 100    ; 启动鼠标检测
-        SetTimer, MoveWindow, 10000    ; 启动窗口移动（每10秒）
-    }
+
+    global isMouseOver := false    ; 初始化鼠标状态跟踪
+    
+    Gui, Destroy    ; 清理可能存在的旧界面
+    Gui, Color, 1C1C1C, 2D2D2D    ; 设置深色主题
+    Gui, Font, cWhite s10, Segoe UI    ; 设置白色字体
+    Gui, Add, Text,, Stand up!`nWould you like it to remind later?    ; 添加提示文本
+    Gui, Add, Button, gYesButton w60 Default, Yes    ; 添加确认按钮
+    Gui, +AlwaysOnTop    ; 设置窗口始终置顶
+    
+    ; 获取屏幕尺寸
+    SysGet, MonitorWorkArea, MonitorWorkArea    ; 获取工作区尺寸
+    
+    ; 获取GUI尺寸
+    Gui, Show, Hide    ; 临时显示用于获取尺寸
+    WinGetPos,,, w, h    ; 获取窗口尺寸
+    
+    ; 显示GUI并启动移动定时器
+    maxX := MonitorWorkAreaRight - w
+    maxY := MonitorWorkAreaBottom - h
+    Random, x, %MonitorWorkAreaLeft%, %maxX%    ; 随机X坐标
+    Random, y, %MonitorWorkAreaTop%, %maxY%    ; 随机Y坐标
+    Gui, Show, x%x% y%y%, Stand Up    ; 在随机位置显示窗口
+    SetTimer, CheckMouse, 100    ; 启动鼠标检测
+    SetTimer, MoveWindow, 10000    ; 启动窗口移动（每10秒）
 return
 
 CheckMouse:    ; 检查鼠标是否在窗口上
