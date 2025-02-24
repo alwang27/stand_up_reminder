@@ -7,6 +7,17 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 Coordmode, Mouse, Screen
 Menu, Tray, Icon, stand.ico
 
+; 初始化程序列表
+global programList := []
+ReadProgramList()
+
+; 添加托盘菜单
+Menu, Tray, NoStandard
+Menu, Tray, Add, 管理程序列表, ManagePrograms
+Menu, Tray, Add
+Menu, Tray, Add, 退出, GuiClose
+Menu, Tray, Default, 管理程序列表
+
 ; 获取用户输入的等待时间
 InputBox, userWait, 设置提醒时间, 请输入提醒间隔时间(分钟):,, 250, 130,,,,, 30    ; 默认30分钟
 
@@ -40,9 +51,13 @@ wait:    ; 主循环开始
     waitTime := minWait * 60 * 1000    ; 转换分钟为毫秒
     Sleep, %waitTime%    ; 等待设定时间
 
-    if WinExist("War Thunder")    ; 检查游戏是否运行
+    ; 检查所有需要避免的程序
+    for index, programName in programList
     {
-        WinWaitClose, War Thunder    ; 等待游戏窗口关闭
+        if WinExist(programName)
+        {
+            WinWaitClose, %programName%
+        }
     }
 
     global isMouseOver := false    ; 初始化鼠标状态跟踪
@@ -103,4 +118,65 @@ GuiClose:    ; 退出程序
     SetTimer, MoveWindow, Off
     Gui, Destroy    ; 清理界面
     ExitApp    ; 退出程序
+return
+
+; 新增函数
+ReadProgramList() {
+    global programList
+    programList := []
+    Loop, Read, %A_ScriptDir%\programs.txt
+    {
+        if (A_LoopReadLine != "")
+            programList.Push(A_LoopReadLine)
+    }
+}
+
+SaveProgramList() {
+    global programList
+    FileDelete, %A_ScriptDir%\programs.txt
+    for index, program in programList
+        FileAppend, %program%`n, %A_ScriptDir%\programs.txt
+}
+
+ManagePrograms:
+    Gui, 2:New
+    Gui, 2:Add, ListView, r10 w300 vProgramListView, 程序名称
+    for index, program in programList
+        LV_Add(, program)
+    Gui, 2:Add, Button, x10 y+10 w80 g2Add, 添加
+    Gui, 2:Add, Button, x+10 w80 g2Delete, 删除
+    Gui, 2:Add, Button, x+10 w80 g2Close, 关闭
+    Gui, 2:Show,, 管理程序列表
+return
+
+2Add:    ; 改为新的标签名
+    InputBox, newProgram, 添加程序, 请输入程序窗口标题:
+    if !ErrorLevel
+    {
+        if newProgram
+        {
+            programList.Push(newProgram)
+            LV_Add(, newProgram)
+            SaveProgramList()
+        }
+    }
+return
+
+2Delete:    ; 改为新的标签名
+    row := LV_GetNext()
+    if row
+    {
+        LV_Delete(row)
+        programList.RemoveAt(row)
+        SaveProgramList()
+    }
+return
+
+2Close:    ; 改为新的标签名
+    Gui, 2:Destroy
+return
+
+2GuiClose:
+2GuiEscape:
+    Gui, 2:Destroy
 return
