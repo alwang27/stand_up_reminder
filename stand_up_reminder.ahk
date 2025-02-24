@@ -9,6 +9,10 @@ Menu, Tray, Icon, stand.ico
 
 ; 初始化主题设置
 global isDarkTheme := true
+global nextRemindTime := 0    ; 添加全局变量存储下一次提醒时间
+
+; 设置托盘图标鼠标悬停消息处理
+OnMessage(0x404, "AHK_NOTIFYICON")
 
 ; 初始化程序列表
 global programList := []
@@ -58,6 +62,7 @@ wait:    ; 主循环开始
     ; 启用 ESC 键处理
     Hotkey, Escape, GuiClose
     waitTime := minWait * 60 * 1000    ; 转换分钟为毫秒
+    nextRemindTime := A_TickCount + waitTime    ; 更新下一次提醒时间
     Sleep, %waitTime%    ; 等待设定时间
 
     ; 检查所有需要避免的程序
@@ -219,4 +224,20 @@ ToggleLightTheme:
     Menu, ThemeMenu, Check, 浅色主题
     Menu, ThemeMenu, Uncheck, 深色主题
     isDarkTheme := false
+return
+
+; 添加托盘图标鼠标悬停处理函数（放在文件末尾）
+AHK_NOTIFYICON(wParam, lParam) {
+    if (lParam = 0x200) {    ; WM_MOUSEMOVE
+        timeLeft := nextRemindTime - A_TickCount
+        if (timeLeft > 0) {
+            timeLeftMinutes := Round(timeLeft / 60000, 1)    ; 转换毫秒为分钟并保留一位小数
+            ToolTip, 下次提醒还有 %timeLeftMinutes% 分钟
+            SetTimer, RemoveToolTip, -3000    ; 3秒后移除提示
+        }
+    }
+}
+
+RemoveToolTip:
+    ToolTip
 return
