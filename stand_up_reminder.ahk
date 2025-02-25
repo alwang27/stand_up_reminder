@@ -1,5 +1,4 @@
-﻿; required by scripts with almost only SetTimer, but it's not necessary for the sleep version
-;#Persistent
+﻿#Persistent
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 ; #Warn  ; Enable warnings to assist with detecting common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
@@ -58,7 +57,6 @@ Sleep, 3000    ; 显示3秒
 ToolTip    ; 清除提示
 
 wait:    ; 主循环开始处理标签
-    Hotkey, Escape, GuiClose    ; 启用 ESC 键关闭程序
     waitTime := minWait * 60 * 1000    ; 将分钟转换为毫秒
     nextRemindTime := A_TickCount + waitTime    ; 计算下次提醒时间点
     Sleep, %waitTime%    ; 等待指定时间
@@ -125,7 +123,6 @@ MoveWindow:    ; 窗口随机移动
 return
 
 YesButton:    ; 继续下一轮提醒
-    Hotkey, Escape, Off    ; 临时禁用 ESC 热键
     SetTimer, CheckMouse, Off
     SetTimer, MoveWindow, Off
     Gui, Destroy
@@ -133,7 +130,6 @@ YesButton:    ; 继续下一轮提醒
 return
 
 GuiClose:    ; 退出程序
-    Hotkey, Escape, Off    ; 禁用 ESC 热键
     SetTimer, CheckMouse, Off
     SetTimer, MoveWindow, Off
     Gui, Destroy    ; 清理界面
