@@ -42,7 +42,7 @@ else if userWait is not number    ; 验证输入是否为数字
     MsgBox, 请输入有效的数字！
     ExitApp
 }
-else if (userWait < 1)    ; 确保时间大于1分钟
+else if (userWait <= 0)    ; 确保时间大于0分钟
 {
     MsgBox, 请输入大于0的数字！
     ExitApp
@@ -87,9 +87,12 @@ wait:    ; 主循环开始处理标签
     ; 设置固定的GUI尺寸
     guiWidth := 250
     guiHeight := 100
-    Gui, +AlwaysOnTop    ; 设置窗口始终置顶
-    Gui, Add, Text, w200 Center, Stand up!`nWould you like it to remind later?    ; 添加提示文本
-    Gui, Add, Button, x95 y+10 w60 gYesButton Default, Yes    ; 添加确认按钮
+    Gui, +AlwaysOnTop -MinimizeBox    ; 添加-MinimizeBox以禁用最小化按钮
+    Gui, Add, Text, w200 Center, Stand up!`nWould you like it to remind later?
+    Gui, Add, Button, x95 y+10 w60 gYesButton Default, Yes
+    
+    ; 获取当前活动窗口
+    WinGetActiveTitle, previousWindow
     
     ; 获取屏幕尺寸
     SysGet, MonitorWorkArea, MonitorWorkArea
@@ -98,11 +101,13 @@ wait:    ; 主循环开始处理标签
     centerX := MonitorWorkAreaLeft + (MonitorWorkAreaRight - MonitorWorkAreaLeft - guiWidth) / 2
     centerY := MonitorWorkAreaTop + (MonitorWorkAreaBottom - MonitorWorkAreaTop - guiHeight) / 2
     
-    ; 首先在屏幕中央显示
+    ; 显示GUI并立即切回原窗口
     Gui, Show, x%centerX% y%centerY% w%guiWidth% h%guiHeight%, Stand Up
+    if previousWindow    ; 如果之前有活动窗口，就切换回去
+        WinActivate, %previousWindow%
     
-    SetTimer, CheckMouse, 100    ; 启动鼠标检测
-    SetTimer, MoveWindow, 10000    ; 启动窗口移动（每10秒）
+    SetTimer, CheckMouse, 100
+    SetTimer, MoveWindow, 10000
 return
 
 CheckMouse:    ; 检查鼠标是否在窗口上
