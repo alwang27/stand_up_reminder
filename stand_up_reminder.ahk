@@ -9,6 +9,7 @@ Menu, Tray, Icon, stand.ico
 global isDarkTheme := true    ; 主题设置：true=深色主题，false=浅色主题
 global nextRemindTime := 0    ; 下次提醒的时间戳（毫秒）
 global programList := []    ; 需要暂停提醒的程序列表
+global currentEdge := 0    ; 0=上边, 1=右边, 2=下边, 3=左边
 
 ; 设置托盘图标鼠标悬停消息处理（0x404 = WM_MOUSEMOVE）
 OnMessage(0x404, "AHK_NOTIFYICON")    ; 监听鼠标悬停事件，用于显示剩余时间
@@ -106,8 +107,13 @@ wait:    ; 主循环开始处理标签
     if previousWindow    ; 如果之前有活动窗口，就切换回去
         WinActivate, %previousWindow%
     
+    ; 在GUI显示代码中初始化起始位置（放在SetTimer之前）
+    currentEdge := 0  ; 从上边开始
+    currentX := MonitorWorkAreaLeft  ; 从左上角开始
+    currentY := MonitorWorkAreaTop
+    
     SetTimer, CheckMouse, 100
-    SetTimer, MoveWindow, 10000
+    SetTimer, MoveWindow, 10000    ; 每10秒移动一次窗口
 return
 
 CheckMouse:    ; 检查鼠标是否在窗口上
@@ -116,15 +122,64 @@ CheckMouse:    ; 检查鼠标是否在窗口上
     isMouseOver := (CurrTitle = "Stand Up")    ; 更新鼠标状态
 return
 
-MoveWindow:    ; 窗口随机移动
+MoveWindow:    ; 窗口边缘移动
     if (!isMouseOver)    ; 仅在鼠标不在窗口上时移动
     {
-        ; 使用之前定义的固定尺寸
+        ; 使用之前定义的固定尺寸和工作区尺寸
         maxX := MonitorWorkAreaRight - guiWidth
         maxY := MonitorWorkAreaBottom - guiHeight
-        Random, x, %MonitorWorkAreaLeft%, %maxX%
-        Random, y, %MonitorWorkAreaTop%, %maxY%
-        WinMove, Stand Up,, %x%, %y%    ; 移动到新位置
+        moveStep := 500    ; 减小每次移动的距离
+        
+        ; 根据当前边缘状态计算新位置
+        Switch currentEdge
+        {
+        Case 0:  ; 上边缘 - 从左向右移动
+            nextX := currentX + moveStep
+            if (nextX <= maxX) {
+                currentX := nextX
+            } else {
+                currentEdge := 1
+                currentX := maxX
+            }
+            currentY := MonitorWorkAreaTop
+            
+        Case 1:  ; 右边缘 - 从上向下移动
+            nextY := currentY + moveStep
+            if (nextY <= maxY) {
+                currentY := nextY
+            } else {
+                currentEdge := 2
+                currentY := maxY
+            }
+            currentX := maxX
+            
+        Case 2:  ; 下边缘 - 从右向左移动
+            nextX := currentX - moveStep
+            if (nextX >= MonitorWorkAreaLeft) {
+                currentX := nextX
+            } else {
+                currentEdge := 3
+                currentX := MonitorWorkAreaLeft
+            }
+            currentY := maxY
+            
+        Case 3:  ; 左边缘 - 从下向上移动
+            nextY := currentY - moveStep
+            if (nextY >= MonitorWorkAreaTop) {
+                currentY := nextY
+            } else {
+                currentEdge := 0
+                currentY := MonitorWorkAreaTop
+            }
+            currentX := MonitorWorkAreaLeft
+        }
+        
+        ; 确保位置在屏幕边界内
+        currentX := Max(MonitorWorkAreaLeft, Min(currentX, maxX))
+        currentY := Max(MonitorWorkAreaTop, Min(currentY, maxY))
+        
+        ; 移动窗口到新位置
+        WinMove, Stand Up,, %currentX%, %currentY%
     }
 return
 
@@ -241,3 +296,12 @@ AHK_NOTIFYICON(wParam, lParam) {    ; 托盘图标鼠标悬停处理函数
 RemoveToolTip:    ; 移除提示的处理标签
     ToolTip    ; 清除当前显示的提示
 return
+
+; 添加辅助函数
+Max(n1, n2) {
+    return (n1 > n2 ? n1 : n2)
+}
+
+Min(n1, n2) {
+    return (n1 < n2 ? n1 : n2)
+}
