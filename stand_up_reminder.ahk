@@ -83,23 +83,24 @@ wait:    ; 主循环开始处理标签
         Gui, Color, F0F0F0, FFFFFF    ; 浅色主题
         Gui, Font, c000000 s10, Segoe UI
     }
-    Gui, Add, Text,, Stand up!`nWould you like it to remind later?    ; 添加提示文本
-    Gui, Add, Button, gYesButton w60 Default, Yes    ; 添加确认按钮
+    
+    ; 设置固定的GUI尺寸
+    guiWidth := 250
+    guiHeight := 100
     Gui, +AlwaysOnTop    ; 设置窗口始终置顶
+    Gui, Add, Text, w200 Center, Stand up!`nWould you like it to remind later?    ; 添加提示文本
+    Gui, Add, Button, x95 y+10 w60 gYesButton Default, Yes    ; 添加确认按钮
     
     ; 获取屏幕尺寸
-    SysGet, MonitorWorkArea, MonitorWorkArea    ; 获取工作区尺寸
+    SysGet, MonitorWorkArea, MonitorWorkArea
     
-    ; 获取GUI尺寸
-    Gui, Show, Hide    ; 临时显示用于获取尺寸
-    WinGetPos,,, w, h    ; 获取窗口尺寸
+    ; 计算屏幕中央位置
+    centerX := MonitorWorkAreaLeft + (MonitorWorkAreaRight - MonitorWorkAreaLeft - guiWidth) / 2
+    centerY := MonitorWorkAreaTop + (MonitorWorkAreaBottom - MonitorWorkAreaTop - guiHeight) / 2
     
-    ; 显示GUI并启动移动定时器
-    maxX := MonitorWorkAreaRight - w
-    maxY := MonitorWorkAreaBottom - h
-    Random, x, %MonitorWorkAreaLeft%, %maxX%    ; 随机X坐标
-    Random, y, %MonitorWorkAreaTop%, %maxY%    ; 随机Y坐标
-    Gui, Show, x%x% y%y%, Stand Up    ; 在随机位置显示窗口
+    ; 首先在屏幕中央显示
+    Gui, Show, x%centerX% y%centerY% w%guiWidth% h%guiHeight%, Stand Up
+    
     SetTimer, CheckMouse, 100    ; 启动鼠标检测
     SetTimer, MoveWindow, 10000    ; 启动窗口移动（每10秒）
 return
@@ -113,9 +114,9 @@ return
 MoveWindow:    ; 窗口随机移动
     if (!isMouseOver)    ; 仅在鼠标不在窗口上时移动
     {
-        WinGetPos,,, w, h, Stand Up
-        maxX := MonitorWorkAreaRight - w
-        maxY := MonitorWorkAreaBottom - h
+        ; 使用之前定义的固定尺寸
+        maxX := MonitorWorkAreaRight - guiWidth
+        maxY := MonitorWorkAreaBottom - guiHeight
         Random, x, %MonitorWorkAreaLeft%, %maxX%
         Random, y, %MonitorWorkAreaTop%, %maxY%
         WinMove, Stand Up,, %x%, %y%    ; 移动到新位置
